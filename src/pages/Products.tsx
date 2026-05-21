@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../context/AppContext';
-import { Zap, ShoppingCart, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Zap, ShoppingCart, Check, ChevronLeft, ChevronRight, Plus, Minus } from 'lucide-react';
 import { EstimateConfiguration, CostBreakdown } from '../types';
 
 interface ProductsProps {
@@ -15,7 +15,7 @@ interface ProductsProps {
 }
 
 export default function Products({ onAddNewInquiry }: ProductsProps) {
-  const { t, language, selectedCategory, setSelectedCategory } = useApp();
+  const { t, language, selectedCategory, setSelectedCategory, basket, addToBasket, updateBasketQuantity } = useApp();
   const [activeInquiryId, setActiveInquiryId] = useState<string | null>(null);
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
@@ -266,9 +266,7 @@ export default function Products({ onAddNewInquiry }: ProductsProps) {
                     ))}
                   </ul>
                 </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-gray-100 dark:border-white/10 space-y-4">
+                          <div className="mt-6 pt-6 border-t border-gray-100 dark:border-white/10 space-y-4">
                 <div className="flex items-baseline justify-between select-none">
                   <span className="text-xs text-gray-400 font-mono uppercase">{t.products.techDetails}</span>
                   <span className="text-2xl font-mono font-bold text-[#0012FF] dark:text-[#00FF00]">
@@ -276,64 +274,122 @@ export default function Products({ onAddNewInquiry }: ProductsProps) {
                   </span>
                 </div>
 
-                <AnimatePresence mode="wait">
-                  {isThisSubmitted ? (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="p-3.5 bg-[#00FF00]/10 border border-[#00FF00]/20 rounded-xl text-center text-xs text-[#00FF00] font-semibold"
-                    >
-                      <Check className="h-4 w-4 mx-auto mb-1 stroke-[3]" />
-                      <span>{t.products.inquirySuccess}</span>
-                    </motion.div>
-                  ) : isFormOpen ? (
-                    <motion.form
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      onSubmit={(e) => handleProductSubmit(e, prod)}
-                      className="bg-gray-50 dark:bg-slate-950 p-4 rounded-xl border border-gray-150 dark:border-white/5 space-y-3"
-                    >
-                      <span className="text-[10px] uppercase font-mono tracking-wider font-extrabold text-[#0012FF] dark:text-cyan-400 block">
-                        {t.products.inquiryTitle}
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <input
-                          required
-                          type="text"
-                          placeholder={t.estimator.formName}
-                          value={clientName}
-                          onChange={(e) => setClientName(e.target.value)}
-                          className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-[#0012FF] outline-none text-gray-800 dark:text-white"
-                        />
-                        <input
-                          required
-                          type="email"
-                          placeholder={t.estimator.formEmail}
-                          value={clientEmail}
-                          onChange={(e) => setClientEmail(e.target.value)}
-                          className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-[#0012FF] outline-none text-gray-800 dark:text-white"
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        className="w-full py-2 px-3 rounded-lg bg-gray-900 dark:bg-[#00FF00] dark:text-gray-950 text-white font-bold hover:bg-gray-800 dark:hover:bg-[#00E000] text-xs transition uppercase cursor-pointer"
-                      >
-                        {t.products.inquireBtn}
-                      </button>
-                    </motion.form>
-                  ) : (
+                <div className="flex flex-col gap-2">
+                  {/* Action row */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Add to basket block */}
+                    {(() => {
+                      const itemInBasket = basket.find(item => item.id === prod.id);
+                      if (itemInBasket) {
+                        return (
+                          <div className="flex items-center justify-between bg-[#0012FF]/5 dark:bg-cyan-400/5 border border-[#0012FF]/20 dark:border-cyan-400/25 rounded-xl px-2 py-1 h-11">
+                            <button
+                              onClick={() => updateBasketQuantity(prod.id, itemInBasket.quantity - 1)}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800 hover:bg-[#0012FF]/10 text-gray-800 dark:text-white border-none cursor-pointer text-xs font-bold"
+                              title="Decrease"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="font-mono text-xs font-bold text-[#0012FF] dark:text-cyan-300">
+                              {itemInBasket.quantity}×
+                            </span>
+                            <button
+                              onClick={() => updateBasketQuantity(prod.id, itemInBasket.quantity + 1)}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-slate-800 hover:bg-[#0012FF]/10 text-gray-800 dark:text-white border-none cursor-pointer text-xs font-bold"
+                              title="Increase"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <button
+                            onClick={() => addToBasket({
+                              id: prod.id,
+                              name: prod.name,
+                              desc: prod.desc,
+                              specs: prod.specs,
+                              estimatedCost: prod.estimatedCost,
+                              voltage: prod.voltage,
+                              amperage: prod.amperage,
+                              leadTime: prod.leadTime,
+                              discipline: prod.discipline,
+                              imageSrc: prod.imageSrc
+                            })}
+                            className="w-full py-2.5 px-3 rounded-xl bg-gray-950 dark:bg-cyan-400 text-white dark:text-slate-950 hover:bg-opacity-90 font-bold text-xs transition uppercase flex items-center justify-center gap-1.5 cursor-pointer border-0"
+                          >
+                            <ShoppingCart className="h-3.5 w-3.5" />
+                            <span>{language === 'tr' ? 'Sepete Ekle' : 'Add to Basket'}</span>
+                          </button>
+                        );
+                      }
+                    })()}
+
+                    {/* Direct RFQ form toggle */}
                     <button
-                      onClick={() => setActiveInquiryId(prod.id)}
-                      className="w-full py-3 px-4 rounded-xl border border-[#0012FF]/20 hover:border-[#0012FF] text-[#0012FF] dark:text-cyan-300 hover:bg-[#0012FF]/5 font-extrabold text-xs transition uppercase flex items-center justify-center gap-2 cursor-pointer bg-white dark:bg-slate-950"
+                      onClick={() => setActiveInquiryId(isFormOpen ? null : prod.id)}
+                      className={`py-2.5 px-3 rounded-xl border font-bold text-xs transition uppercase flex items-center justify-center gap-1.5 cursor-pointer bg-transparent truncate ${
+                        isFormOpen
+                          ? 'border-red-500/30 text-red-500 hover:bg-red-500/5'
+                          : 'border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#0012FF] dark:hover:border-cyan-400'
+                      }`}
                     >
-                      <ShoppingCart className="h-4 w-4" />
-                      <span>{t.products.inquireBtn}</span>
+                      <span>{isFormOpen ? (language === 'tr' ? 'Kapat' : 'Close') : (language === 'tr' ? 'Hızlı Teklif' : 'Quick RFQ')}</span>
                     </button>
-                  )}
-                </AnimatePresence>
-              </div>
+                  </div>
+
+                  <AnimatePresence mode="wait">
+                    {isThisSubmitted ? (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="p-3.5 bg-[#00FF00]/10 border border-[#00FF00]/20 rounded-xl text-center text-xs text-[#00FF00] font-semibold"
+                      >
+                        <Check className="h-4 w-4 mx-auto mb-1 stroke-[3]" />
+                        <span>{t.products.inquirySuccess}</span>
+                      </motion.div>
+                    ) : isFormOpen ? (
+                      <motion.form
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        onSubmit={(e) => handleProductSubmit(e, prod)}
+                        className="bg-gray-50/50 dark:bg-slate-950 p-4 rounded-xl border border-gray-150 dark:border-white/5 space-y-3 mt-2 overflow-hidden"
+                      >
+                        <span className="text-[10px] uppercase font-mono tracking-wider font-extrabold text-[#0012FF] dark:text-cyan-400 block">
+                          {t.products.inquiryTitle}
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <input
+                            required
+                            type="text"
+                            placeholder={t.estimator.formName}
+                            value={clientName}
+                            onChange={(e) => setClientName(e.target.value)}
+                            className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-[#0012FF] outline-none text-gray-800 dark:text-white"
+                          />
+                          <input
+                            required
+                            type="email"
+                            placeholder={t.estimator.formEmail}
+                            value={clientEmail}
+                            onChange={(e) => setClientEmail(e.target.value)}
+                            className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-[#0012FF] outline-none text-gray-800 dark:text-white"
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          className="w-full py-2 px-3 rounded-lg bg-gray-900 dark:bg-[#00FF00] dark:text-gray-950 text-white font-bold hover:bg-gray-800 dark:hover:bg-[#00E000] text-xs transition uppercase cursor-pointer border-0"
+                        >
+                          {t.products.inquireBtn}
+                        </button>
+                      </motion.form>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
+              </div>    </div>
             </div>
           );
         })}

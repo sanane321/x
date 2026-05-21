@@ -14,7 +14,8 @@ import {
   Sun,
   Moon,
   Globe2,
-  ChevronDown
+  ChevronDown,
+  ShoppingCart
 } from 'lucide-react';
 
 import Logo from './components/Logo';
@@ -33,6 +34,7 @@ import Careers from './pages/Careers';
 import Contacts from './pages/Contacts';
 import Downloads from './pages/Downloads';
 import Iot from './pages/Iot';
+import BasketDrawer from './components/BasketDrawer';
 
 interface InquiryItem {
   id: string;
@@ -52,10 +54,23 @@ interface AppProps {
 }
 
 export default function App({ ssrPath }: AppProps) {
-  const { t, theme, language, toggleTheme, toggleLanguage, setSelectedIotUseCase, setSelectedCategory } = useApp();
+  const { 
+    t, 
+    theme, 
+    language, 
+    toggleTheme, 
+    toggleLanguage, 
+    setSelectedIotUseCase, 
+    setSelectedCategory, 
+    basket, 
+    isBasketOpen, 
+    setBasketOpen 
+  } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileIotSubmenuOpen, setMobileIotSubmenuOpen] = useState(false);
   const [mobileProductsSubmenuOpen, setMobileProductsSubmenuOpen] = useState(false);
+  const [desktopIotSubmenuOpen, setDesktopIotSubmenuOpen] = useState(false);
+  const [desktopProductsSubmenuOpen, setDesktopProductsSubmenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   
   // Custom router state synchronized with the URL path or hash
@@ -67,18 +82,28 @@ export default function App({ ssrPath }: AppProps) {
     if (typeof window === 'undefined') return '#/home';
     
     // Support direct clean URL path first (e.g. /services -> #/services)
+    // To prevent hydration mismatches, we must ONLY use window.location.pathname during
+    // initial render/hydration because URL hash is not visible to the server.
     const pathname = window.location.pathname;
     if (pathname && pathname !== '/') {
       return `#/${pathname.replace(/^\//, '')}`;
     }
     
-    const hash = window.location.hash;
-    return (hash === '' || hash === '#/') ? '#/home' : hash;
+    return '#/home';
   });
 
   // Handle URL hash changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    // After mount (safe from hydration mismatches), sync with the actual client URL hash or pathname
+    const hash = window.location.hash;
+    const pathname = window.location.pathname;
+    if (hash && hash !== '#/' && hash !== '') {
+      setCurrentPath(hash);
+    } else if (pathname && pathname !== '/') {
+      setCurrentPath(`#/${pathname.replace(/^\//, '')}`);
+    }
 
     const handleHashChange = () => {
       const hash = window.location.hash;
@@ -88,8 +113,6 @@ export default function App({ ssrPath }: AppProps) {
     };
 
     // If starting on empty/root hash or direct URL, align them
-    const hash = window.location.hash;
-    const pathname = window.location.pathname;
     if (pathname && pathname !== '/') {
       const clean = `#/${pathname.replace(/^\//, '')}`;
       if (hash !== clean) {
@@ -189,6 +212,10 @@ export default function App({ ssrPath }: AppProps) {
     setInquiries(prev => prev.filter(item => item.id !== id));
   };
 
+  const handleAddBasketInquiry = (newInquiry: InquiryItem) => {
+    setInquiries(prev => [newInquiry, ...prev]);
+  };
+
   // Helper to determine active link states
   const isLinkActive = (hash: string) => currentPath === hash;
 
@@ -230,13 +257,278 @@ export default function App({ ssrPath }: AppProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0b101d] text-gray-800 dark:text-gray-100 font-sans antialiased selection:bg-[#0012FF]/10 selection:text-[#0012FF] flex flex-col justify-between transition-colors duration-200">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0b101d] text-gray-800 dark:text-gray-100 font-sans antialiased selection:bg-[#0012FF]/10 selection:text-[#0012FF] flex flex-col justify-between transition-colors duration-200">
       
+      {/* DESKTOP PERSISTENT LEFT SIDEBAR */}
+      <aside className="hidden xl:flex fixed top-0 left-0 bottom-0 w-72 bg-white dark:bg-[#0c1322] border-r border-gray-150 dark:border-white/10 flex-col justify-between p-6 z-30 overflow-y-auto">
+        <div className="space-y-6">
+          <div className="pb-4 border-b border-gray-150 dark:border-white/5 flex items-center justify-between">
+            <button 
+              onClick={() => navigateTo('#/home')} 
+              className="flex-shrink-0 transition-opacity hover:opacity-90 cursor-pointer bg-transparent border-none p-0"
+            >
+              <Logo size="md" lightBackground={theme === 'light'} />
+            </button>
+          </div>
+          
+          <nav className="flex flex-col gap-1 text-[11px] font-sans font-bold tracking-wider uppercase">
+            <button 
+              onClick={() => navigateTo('#/home')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/home') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.vision}
+            </button>
+            <button 
+              onClick={() => navigateTo('#/services')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/services') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.services}
+            </button>
+            
+            {/* Products Dropdown Accordion */}
+            <div>
+              <button 
+                onClick={() => {
+                  setDesktopProductsSubmenuOpen(!desktopProductsSubmenuOpen);
+                  setSelectedCategory(null);
+                  navigateTo('#/products');
+                }} 
+                className={`w-full flex items-center justify-between transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                  isLinkActive('#/products') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <span>{t.nav.products}</span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${desktopProductsSubmenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {desktopProductsSubmenuOpen && (
+                <div className="pl-4 pr-1 mt-1 space-y-0.5 border-l border-gray-150 dark:border-white/10 flex flex-col">
+                  <button 
+                    onClick={() => {
+                      setSelectedCategory(null);
+                      navigateTo('#/products');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    🚀 {language === 'tr' ? '1. Tüm Sistemler' : '1. All Systems'}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setSelectedCategory('industrial');
+                      navigateTo('#/products');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    🏭 {language === 'tr' ? '2. Ağır Sanayi' : '2. Heavy Industrial'}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setSelectedCategory('renewable');
+                      navigateTo('#/products');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    ☀️ {language === 'tr' ? '3. Yenilenebilir' : '3. Renewable'}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setSelectedCategory('datacenter');
+                      navigateTo('#/products');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    💾 {language === 'tr' ? '4. Kritik Yedekleme' : '4. Critical Backup'}
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setSelectedCategory('commercial');
+                      navigateTo('#/products');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    🏢 {language === 'tr' ? '5. Akıllı Bina (BMS)' : '5. Smart BMS'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* IoT Grid Dropdown Accordion */}
+            <div>
+              <button 
+                onClick={() => {
+                  setDesktopIotSubmenuOpen(!desktopIotSubmenuOpen);
+                  navigateTo('#/iot');
+                }} 
+                className={`w-full flex items-center justify-between transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                  isLinkActive('#/iot') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <span>{t.nav.iot}</span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${desktopIotSubmenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {desktopIotSubmenuOpen && (
+                <div className="pl-4 pr-1 mt-1 space-y-0.5 border-l border-gray-150 dark:border-white/10 flex flex-col">
+                  <button 
+                    onClick={() => {
+                      setSelectedIotUseCase('thermal');
+                      navigateTo('#/iot');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    ❄️ 1. Predictive Cooling
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setSelectedIotUseCase('peak-shaving');
+                      navigateTo('#/iot');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    🔋 2. Peak Shaving
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setSelectedIotUseCase('var-control');
+                      navigateTo('#/iot');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    ⚡ 3. CAP-Correction
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setSelectedIotUseCase('islanding');
+                      navigateTo('#/iot');
+                    }}
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                  >
+                    🛡️ 4. Islanding Isolation
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <button 
+              onClick={() => navigateTo('#/estimator')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/estimator') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.estimator}
+            </button>
+            <button 
+              onClick={() => navigateTo('#/portfolio')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/portfolio') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.works}
+            </button>
+            <button 
+              onClick={() => navigateTo('#/blog')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/blog') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.blog}
+            </button>
+            <button 
+              onClick={() => navigateTo('#/about')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/about') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.about}
+            </button>
+            <button 
+              onClick={() => navigateTo('#/careers')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/careers') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.careers}
+            </button>
+            <button 
+              onClick={() => navigateTo('#/downloads')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/downloads') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.downloads}
+            </button>
+            <button 
+              onClick={() => navigateTo('#/contact')} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                isLinkActive('#/contact') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {t.nav.contact}
+            </button>
+
+            <button 
+              onClick={() => setBasketOpen(true)}
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl flex items-center justify-between ${
+                basket.length > 0 
+                  ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-bold border border-dashed border-[#0012FF]/30 dark:border-cyan-400/30' 
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <span className="flex items-center gap-1.5 font-bold">
+                <ShoppingCart className="h-3.5 w-3.5" />
+                <span>{language === 'tr' ? 'Teklif Sepetiniz' : 'Order Basket'}</span>
+              </span>
+              {basket.length > 0 && (
+                <span className="bg-[#0012FF] dark:bg-cyan-400 text-white dark:text-slate-950 px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold leading-none animate-pulse">
+                  {basket.reduce((sum, item) => sum + item.quantity, 0)}
+                </span>
+              )}
+            </button>
+          </nav>
+        </div>
+
+        {/* Desktop Sidebar Utilities */}
+        <div className="space-y-4 pt-4 border-t border-gray-150 dark:border-white/5">
+          <div className="flex items-center justify-between gap-2">
+            {/* Language Switch */}
+            <button
+              onClick={toggleLanguage}
+              title="Switch Language"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-300 transition flex items-center gap-1.5 cursor-pointer border-0 bg-transparent text-xs font-mono font-bold uppercase"
+            >
+              <Globe2 className="h-4 w-4" />
+              <span>{language === 'en' ? 'EN' : 'TR'}</span>
+            </button>
+
+            {/* Theme Trigger */}
+            <button
+              onClick={toggleTheme}
+              title="Toggle Theme Mode"
+              className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-300 transition cursor-pointer border-0 bg-transparent"
+            >
+              {theme === 'light' ? <Moon className="h-4.5 w-4.5" /> : <Sun className="h-4.5 w-4.5 text-amber-400" />}
+            </button>
+          </div>
+
+          <button
+            onClick={() => navigateTo('#/estimator')}
+            className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl border border-gray-200 dark:border-white/10 hover:border-[#0012FF] dark:hover:border-cyan-400 text-[10px] font-bold uppercase hover:bg-[#0012FF]/5 text-gray-800 dark:text-gray-200 transition-all gap-1 cursor-pointer bg-white dark:bg-slate-900"
+          >
+            <span>{t.nav.actionBtn}</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </aside>
+
       {/* HEADER SECTION */}
-      <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+      <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 xl:hidden ${
         isScrolled 
           ? 'bg-white/95 dark:bg-[#0c1322]/95 backdrop-blur-md shadow-md border-b border-gray-150 dark:border-white/10 py-3' 
-          : 'bg-transparent py-5'
+          : 'bg-white/80 dark:bg-[#0c1322]/80 backdrop-blur-xs py-4 border-b border-gray-100 dark:border-white/5'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <button 
@@ -519,6 +811,20 @@ export default function App({ ssrPath }: AppProps) {
               {theme === 'light' ? <Moon className="h-4.5 w-4.5" /> : <Sun className="h-4.5 w-4.5 text-amber-400" />}
             </button>
 
+            {/* Mobile Basket Trigger */}
+            <button
+              onClick={() => setBasketOpen(true)}
+              title="Open Order Basket"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 dark:text-gray-300 transition cursor-pointer border-0 bg-transparent relative flex items-center justify-center"
+            >
+              <ShoppingCart className="h-4.5 w-4.5" />
+              {basket.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#0012FF] dark:bg-cyan-400 text-white dark:text-slate-950 h-4 w-4 rounded-full text-[8px] font-mono font-bold flex items-center justify-center leading-none animate-pulse">
+                  {basket.reduce((sum, item) => sum + item.quantity, 0)}
+                </span>
+              )}
+            </button>
+
             {/* Standard Estimator link */}
             <button
               onClick={() => navigateTo('#/estimator')}
@@ -755,14 +1061,14 @@ export default function App({ ssrPath }: AppProps) {
       </header>
 
       {/* DETACHED MAIN TRANSITIONAL CONTENT LAYER */}
-      <main className="flex-grow pt-24 sm:pt-28 pb-12 w-full">
+      <main className="flex-grow pt-24 sm:pt-28 xl:pt-12 xl:pl-72 pb-12 w-full">
         <AnimatePresence mode="wait">
           {renderPage()}
         </AnimatePresence>
       </main>
 
       {/* FOOTER SECTION */}
-      <footer className="bg-gray-950 text-gray-400 py-16 border-t border-gray-900 relative">
+      <footer className="xl:pl-72 bg-gray-950 text-gray-400 py-16 border-t border-gray-900 relative">
         <div className="absolute inset-x-0 top-0 h-[100px] bg-gradient-to-b from-gray-55/5 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10 text-left w-full">
           
@@ -829,6 +1135,32 @@ export default function App({ ssrPath }: AppProps) {
 
         </div>
       </footer>
+
+      {/* Floating Order Basket Dynamic FAB */}
+      <AnimatePresence>
+        {basket.length > 0 && !isBasketOpen && (
+          <motion.button
+            key="basket-fab"
+            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 50 }}
+            onClick={() => setBasketOpen(true)}
+            className="fixed bottom-6 right-6 z-40 p-4 rounded-full bg-[#0012FF] dark:bg-cyan-400 text-white dark:text-slate-950 shadow-2xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-transform duration-200 border-0 cursor-pointer"
+            id="order-basket-fab"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            <span className="text-xs font-bold uppercase tracking-wider font-mono hidden sm:inline">
+              {language === 'tr' ? 'Sepeti İncele' : 'Review Basket'}
+            </span>
+            <span className="bg-white dark:bg-slate-900 text-[#0012FF] dark:text-cyan-400 h-5 w-5 rounded-full text-[10px] font-mono font-extrabold flex items-center justify-center leading-none shadow-inner">
+              {basket.reduce((sum, item) => sum + item.quantity, 0)}
+            </span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Slide-out checkout Drawer */}
+      <BasketDrawer onAddInquiry={handleAddBasketInquiry} />
 
     </div>
   );

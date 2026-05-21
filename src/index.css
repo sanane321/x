@@ -13,22 +13,21 @@
   --color-electric-dark: #000EAF;
   --color-electric-light: #4D64FF;
 
-  /* Redefine global light theme colors as pristine modern white theme */
-  --color-white: #ffffff;                      /* Real pristine white cards and containers */
-  --color-gray-50: #f9fafb;                    /* Soft clean grey sections */
-  --color-gray-100: #f3f4f6;                   /* Page background in light mode */
-  --color-gray-150: #e5e7eb;                   /* Crisp thin outline borders */
-  --color-gray-200: #e5e7eb;                   /* Clean standard borders */
-  --color-gray-250: #d1d5db;
-  --color-gray-300: #d1d5db;
+  /* Redefine global light theme colors to be a premium, sophisticated dimmer light mode (concrete, matte silver, charcoal and slate-steel elements) */
+  --color-white: #eaeef3;                      /* Muted matte silver-grey for sidebars, cards, and floating panels */
+  --color-gray-50: #dee3e8;                    /* Intermediate slightly darker grey */
+  --color-gray-100: #d0d6dd;                   /* Standard body backdrop to make the base screen background darker */
+  --color-gray-150: #bdc3cb;                   /* Distinct modern thin lines */
+  --color-gray-200: #a7adb5;                   /* High visibility borders */
+  --color-gray-250: #939aa2;
+  --color-gray-300: #7f868e;
   
-  --color-gray-400: #9ca3af;                   /* Neutral description text */
-  --color-gray-500: #6b7280;                   /* Secondary descriptive text */
-  --color-gray-600: #4b5563;                   /* Strong body text */
-  --color-gray-700: #374151;                   /* Highlight and subtext */
-  --color-gray-200: #e5e7eb;
-  --color-gray-800: #1f2937;                   /* Primary dark body text */
-  --color-gray-900: #111827;                   /* Crisp modern dark charcoal titles */
+  --color-gray-400: #4d5562;                   /* Bold text & dark sub-headers */
+  --color-gray-500: #3a414d;                   /* Secondary text */
+  --color-gray-600: #2a303b;                   /* Active body copy */
+  --color-gray-700: #1f242e;                   /* Accent headings */
+  --color-gray-800: #151a24;                   /* Main body text */
+  --color-gray-900: #0a0d14;                   /* Ultra-deep charcoal heavy headings */
 }
 
 html {

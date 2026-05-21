@@ -67,3 +67,18 @@ export interface CostBreakdown {
   commissioningCost: number;
   totalCost: number;
 }
+
+export interface BasketItem {
+  id: string;
+  name: string;
+  desc: string;
+  specs: string[];
+  estimatedCost: number;
+  voltage: string;
+  amperage: number;
+  quantity: number;
+  imageSrc?: string;
+  leadTime: number;
+  discipline: string;
+}
+

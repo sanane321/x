@@ -5,6 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { translations, TranslationDictionary } from '../translations';
+import { BasketItem } from '../types';
 
 type Language = 'en' | 'tr';
 type Theme = 'light' | 'dark';
@@ -20,6 +21,13 @@ interface AppContextType {
   setSelectedIotUseCase: (id: string | null) => void;
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
+  basket: BasketItem[];
+  addToBasket: (item: Omit<BasketItem, 'quantity'>) => void;
+  removeFromBasket: (itemId: string) => void;
+  updateBasketQuantity: (itemId: string, quantity: number) => void;
+  clearBasket: () => void;
+  isBasketOpen: boolean;
+  setBasketOpen: (open: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -29,6 +37,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [language, setLanguageState] = useState<Language>('en');
   const [theme, setThemeState] = useState<Theme>('light');
+  const [basket, setBasket] = useState<BasketItem[]>([]);
+  const [isBasketOpen, setBasketOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
@@ -44,6 +54,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
+      }
+    }
+    const savedBasket = localStorage.getItem('x_elektrik_basket');
+    if (savedBasket) {
+      try {
+        setBasket(JSON.parse(savedBasket));
+      } catch (e) {
+        console.error('Error parsing saved basket', e);
       }
     }
     setIsHydrated(true);
@@ -67,6 +85,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [theme, isHydrated]);
 
+  useEffect(() => {
+    if (isHydrated) {
+      localStorage.setItem('x_elektrik_basket', JSON.stringify(basket));
+    }
+  }, [basket, isHydrated]);
+
   const toggleLanguage = () => {
     setLanguageState((prev) => (prev === 'en' ? 'tr' : 'en'));
   };
@@ -77,6 +101,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => {
     setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const addToBasket = (item: Omit<BasketItem, 'quantity'>) => {
+    setBasket((prev) => {
+      const existing = prev.find((i) => i.id === item.id);
+      if (existing) {
+        return prev.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i));
+      }
+      return [...prev, { ...item, quantity: 1 }];
+    });
+  };
+
+  const removeFromBasket = (itemId: string) => {
+    setBasket((prev) => prev.filter((i) => i.id !== itemId));
+  };
+
+  const updateBasketQuantity = (itemId: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromBasket(itemId);
+      return;
+    }
+    setBasket((prev) => prev.map((i) => (i.id === itemId ? { ...i, quantity } : i)));
+  };
+
+  const clearBasket = () => {
+    setBasket([]);
   };
 
   const t = translations[language];
@@ -94,6 +144,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setSelectedIotUseCase,
         selectedCategory,
         setSelectedCategory,
+        basket,
+        addToBasket,
+        removeFromBasket,
+        updateBasketQuantity,
+        clearBasket,
+        isBasketOpen,
+        setBasketOpen,
       }}
     >
       {children}
