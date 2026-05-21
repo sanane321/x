@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@variant dark (.dark &);
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-electric: #0012FF;
+  --color-neon: #00FF00;
+  --color-electric-dark: #000EAF;
+  --color-electric-light: #4D64FF;
+
+  /* Redefine global light theme colors as pristine modern white theme */
+  --color-white: #ffffff;                      /* Real pristine white cards and containers */
+  --color-gray-50: #f9fafb;                    /* Soft clean grey sections */
+  --color-gray-100: #f3f4f6;                   /* Page background in light mode */
+  --color-gray-150: #e5e7eb;                   /* Crisp thin outline borders */
+  --color-gray-200: #e5e7eb;                   /* Clean standard borders */
+  --color-gray-250: #d1d5db;
+  --color-gray-300: #d1d5db;
+  
+  --color-gray-400: #9ca3af;                   /* Neutral description text */
+  --color-gray-500: #6b7280;                   /* Secondary descriptive text */
+  --color-gray-600: #4b5563;                   /* Strong body text */
+  --color-gray-700: #374151;                   /* Highlight and subtext */
+  --color-gray-200: #e5e7eb;
+  --color-gray-800: #1f2937;                   /* Primary dark body text */
+  --color-gray-900: #111827;                   /* Crisp modern dark charcoal titles */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+

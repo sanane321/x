@@ -1,0 +1,6 @@
+{
+  "name": "X Elektrik",
+  "description": "High-fidelity digital experience for X Elektrik, a premium electrical construction and engineering firm specializing in commercial, industrial, and sustainable smart-grid power solutions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
