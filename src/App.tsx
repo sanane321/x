@@ -263,212 +263,244 @@ export default function App({ ssrPath }: AppProps) {
       <aside className="hidden xl:flex fixed top-0 left-0 bottom-0 w-72 bg-white dark:bg-[#0c1322] border-r border-gray-150 dark:border-white/10 flex-col justify-between p-6 z-30 overflow-y-auto">
         <div className="space-y-6">
           <div className="pb-4 border-b border-gray-150 dark:border-white/5 flex items-center justify-between">
-            <button 
-              onClick={() => navigateTo('#/home')} 
-              className="flex-shrink-0 transition-opacity hover:opacity-90 cursor-pointer bg-transparent border-none p-0"
+            <a 
+              href="/"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/home'); }} 
+              className="flex-shrink-0 transition-opacity hover:opacity-90 cursor-pointer bg-transparent border-none p-0 block no-underline"
             >
               <Logo size="md" lightBackground={theme === 'light'} />
-            </button>
+            </a>
           </div>
           
           <nav className="flex flex-col gap-1 text-[11px] font-sans font-bold tracking-wider uppercase">
-            <button 
-              onClick={() => navigateTo('#/home')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            <a 
+              href="/"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/home'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/home') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.vision}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/services')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            </a>
+            <a 
+              href="/services"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/services'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/services') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.services}
-            </button>
+            </a>
             
             {/* Products Dropdown Accordion */}
             <div>
-              <button 
-                onClick={() => {
+              <a 
+                href="/products"
+                onClick={(e) => {
+                  e.preventDefault();
                   setDesktopProductsSubmenuOpen(!desktopProductsSubmenuOpen);
                   setSelectedCategory(null);
                   navigateTo('#/products');
                 }} 
-                className={`w-full flex items-center justify-between transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                className={`w-full flex items-center justify-between transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline ${
                   isLinkActive('#/products') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 <span>{t.nav.products}</span>
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${desktopProductsSubmenuOpen ? 'rotate-180' : ''}`} />
-              </button>
+              </a>
               
               {desktopProductsSubmenuOpen && (
                 <div className="pl-4 pr-1 mt-1 space-y-0.5 border-l border-gray-150 dark:border-white/10 flex flex-col">
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/products"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory(null);
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     🚀 {language === 'tr' ? '1. Tüm Sistemler' : '1. All Systems'}
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/products?category=industrial"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory('industrial');
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     🏭 {language === 'tr' ? '2. Ağır Sanayi' : '2. Heavy Industrial'}
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/products?category=renewable"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory('renewable');
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     ☀️ {language === 'tr' ? '3. Yenilenebilir' : '3. Renewable'}
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/products?category=datacenter"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory('datacenter');
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     💾 {language === 'tr' ? '4. Kritik Yedekleme' : '4. Critical Backup'}
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/products?category=commercial"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory('commercial');
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     🏢 {language === 'tr' ? '5. Akıllı Bina (BMS)' : '5. Smart BMS'}
-                  </button>
+                  </a>
                 </div>
               )}
             </div>
 
             {/* IoT Grid Dropdown Accordion */}
             <div>
-              <button 
-                onClick={() => {
+              <a 
+                href="/iot"
+                onClick={(e) => {
+                  e.preventDefault();
                   setDesktopIotSubmenuOpen(!desktopIotSubmenuOpen);
                   navigateTo('#/iot');
                 }} 
-                className={`w-full flex items-center justify-between transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+                className={`w-full flex items-center justify-between transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline ${
                   isLinkActive('#/iot') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 <span>{t.nav.iot}</span>
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${desktopIotSubmenuOpen ? 'rotate-180' : ''}`} />
-              </button>
+              </a>
               
               {desktopIotSubmenuOpen && (
                 <div className="pl-4 pr-1 mt-1 space-y-0.5 border-l border-gray-150 dark:border-white/10 flex flex-col">
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/iot?usecase=thermal"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedIotUseCase('thermal');
                       navigateTo('#/iot');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     ❄️ 1. Predictive Cooling
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/iot?usecase=peak-shaving"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedIotUseCase('peak-shaving');
                       navigateTo('#/iot');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     🔋 2. Peak Shaving
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/iot?usecase=var-control"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedIotUseCase('var-control');
                       navigateTo('#/iot');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     ⚡ 3. CAP-Correction
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/iot?usecase=islanding"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedIotUseCase('islanding');
                       navigateTo('#/iot');
                     }}
-                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase text-left"
+                    className="w-full text-left p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer text-[10px] font-mono font-medium text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300 uppercase no-underline block"
                   >
                     🛡️ 4. Islanding Isolation
-                  </button>
+                  </a>
                 </div>
               )}
             </div>
 
-            <button 
-              onClick={() => navigateTo('#/estimator')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            <a 
+              href="/estimator"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/estimator'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/estimator') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.estimator}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/portfolio')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            </a>
+            <a 
+              href="/portfolio"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/portfolio'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/portfolio') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.works}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/blog')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            </a>
+            <a 
+              href="/blog"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/blog'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/blog') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.blog}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/about')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            </a>
+            <a 
+              href="/about"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/about'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/about') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.about}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/careers')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            </a>
+            <a 
+              href="/careers"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/careers'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/careers') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.careers}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/downloads')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            </a>
+            <a 
+              href="/downloads"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/downloads'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/downloads') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.downloads}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/contact')} 
-              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl ${
+            </a>
+            <a 
+              href="/contact"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/contact'); }} 
+              className={`w-full text-left transition-colors cursor-pointer bg-transparent border-none px-4 py-2.5 rounded-xl no-underline block ${
                 isLinkActive('#/contact') ? 'text-[#0012FF] dark:text-cyan-400 bg-[#0012FF]/5 dark:bg-cyan-400/5 font-extrabold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {t.nav.contact}
-            </button>
+            </a>
 
             <button 
               onClick={() => setBasketOpen(true)}
@@ -514,13 +546,14 @@ export default function App({ ssrPath }: AppProps) {
             </button>
           </div>
 
-          <button
-            onClick={() => navigateTo('#/estimator')}
-            className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl border border-gray-200 dark:border-white/10 hover:border-[#0012FF] dark:hover:border-cyan-400 text-[10px] font-bold uppercase hover:bg-[#0012FF]/5 text-gray-800 dark:text-gray-200 transition-all gap-1 cursor-pointer bg-white dark:bg-slate-900"
+          <a
+            href="/estimator"
+            onClick={(e) => { e.preventDefault(); navigateTo('#/estimator'); }}
+            className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl border border-gray-200 dark:border-white/10 hover:border-[#0012FF] dark:hover:border-cyan-400 text-[10px] font-bold uppercase hover:bg-[#0012FF]/5 text-gray-800 dark:text-gray-200 transition-all gap-1 cursor-pointer bg-white dark:bg-slate-900 no-underline"
           >
             <span>{t.nav.actionBtn}</span>
             <ArrowUpRight className="h-3.5 w-3.5" />
-          </button>
+          </a>
         </div>
       </aside>
 
@@ -531,44 +564,49 @@ export default function App({ ssrPath }: AppProps) {
           : 'bg-white/80 dark:bg-[#0c1322]/80 backdrop-blur-xs py-4 border-b border-gray-100 dark:border-white/5'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <button 
-            onClick={() => navigateTo('#/home')} 
-            className="flex-shrink-0 transition-opacity hover:opacity-90 cursor-pointer bg-transparent border-none p-0"
+          <a 
+            href="/"
+            onClick={(e) => { e.preventDefault(); navigateTo('#/home'); }} 
+            className="flex-shrink-0 transition-opacity hover:opacity-90 cursor-pointer bg-transparent border-none p-0 no-underline block"
           >
             <Logo size="md" lightBackground={theme === 'light'} />
-          </button>
+          </a>
 
           {/* Desktop Navigation Links */}
           <nav className="hidden xl:flex items-center gap-6 text-[11px] lg:text-[12px] font-sans font-bold tracking-wider uppercase">
-            <button 
-              onClick={() => navigateTo('#/home')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            <a 
+              href="/"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/home'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/home') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.vision}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/services')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            </a>
+            <a 
+              href="/services"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/services'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/services') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.services}
-            </button>
+            </a>
             <div className="relative group py-1 flex items-center">
-              <button 
-                onClick={() => {
+              <a 
+                href="/products"
+                onClick={(e) => {
+                  e.preventDefault();
                   setSelectedCategory(null);
                   navigateTo('#/products');
                 }} 
-                className={`transition-colors cursor-pointer bg-transparent border-none py-1 flex items-center gap-1 ${
+                className={`transition-colors cursor-pointer bg-transparent border-none py-1 flex items-center gap-1 no-underline ${
                   isLinkActive('#/products') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
                 }`}
               >
                 <span>{t.nav.products}</span>
                 <ChevronDown className="h-3 w-3 transition-transform duration-200 group-hover:rotate-180 opacity-70" />
-              </button>
+              </a>
               
               {/* Desktop Products Submenu */}
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-80 bg-white dark:bg-[#0c1322] border border-gray-150 dark:border-white/10 rounded-2xl p-4 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none group-hover:pointer-events-auto">
@@ -576,12 +614,14 @@ export default function App({ ssrPath }: AppProps) {
                   {language === 'tr' ? 'MÜHENDİSLİK ÜRÜN GRUPLARI' : 'ENGINEERING PRODUCT RANGES'}
                 </span>
                 <div className="space-y-1">
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/products"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory(null);
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight">
                       {language === 'tr' ? '1. TÜM SİSTEMLER' : '1. ALL SYSTEMS'}
@@ -589,14 +629,16 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       {language === 'tr' ? 'Tüm orta ve yüksek gerilim donanımları, kabinler ve depolama.' : 'Full Medium and High voltage hardware, stabilizers, and cabinets.'}
                     </span>
-                  </button>
+                  </a>
 
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/products?category=industrial"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory('industrial');
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight">
                       {language === 'tr' ? '2. AĞIR SANAYİ' : '2. HEAVY INDUSTRIAL'}
@@ -604,14 +646,16 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       {language === 'tr' ? 'Ağır sanayi 24kV orta gerilim switchgear elemanları.' : 'Heavy-duty 24kV medium-voltage plant switchgear.'}
                     </span>
-                  </button>
+                  </a>
 
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/products?category=renewable"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory('renewable');
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight">
                       {language === 'tr' ? '3. YENİLENEBİLİR ŞEBEKE' : '3. RENEWABLE GRID'}
@@ -619,14 +663,16 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       {language === 'tr' ? '5MW şebeke dengeleyici MegaPack bataryalar ve DC hızlı şarj üniteleri.' : '5MW peak stabilizer MegaPacks and DC fast chargers.'}
                     </span>
-                  </button>
+                  </a>
 
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/products?category=datacenter"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory('datacenter');
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight">
                       {language === 'tr' ? '4. KRİTİK VERİ MERKEZLERİ' : '4. CRITICAL DATA BACKUP'}
@@ -634,14 +680,16 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       {language === 'tr' ? '4ms altında gecikmeli yedekli ATS transfer şalterleri.' : 'Under 4ms transfer dynamic redundant switchgears.'}
                     </span>
-                  </button>
+                  </a>
 
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/products?category=commercial"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedCategory('commercial');
                       navigateTo('#/products');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight text-left">
                       {language === 'tr' ? '5. AKILLI BİNA (BMS)' : '5. SMART BMS CONTROL'}
@@ -649,20 +697,21 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       {language === 'tr' ? 'Ethernet fiber ve akıllı sensörlü bina yönetim sistemleri.' : 'Fiber IoT integrated modern building cabinets.'}
                     </span>
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
             <div className="relative group py-1 flex items-center">
-              <button 
-                onClick={() => navigateTo('#/iot')} 
-                className={`transition-colors cursor-pointer bg-transparent border-none py-1 flex items-center gap-1 ${
+              <a 
+                href="/iot"
+                onClick={(e) => { e.preventDefault(); navigateTo('#/iot'); }} 
+                className={`transition-colors cursor-pointer bg-transparent border-none py-1 flex items-center gap-1 no-underline ${
                   isLinkActive('#/iot') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
                 }`}
               >
                 <span>{t.nav.iot}</span>
                 <ChevronDown className="h-3 w-3 transition-transform duration-200 group-hover:rotate-180 opacity-70" />
-              </button>
+              </a>
               
               {/* Desktop Submenu */}
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-80 bg-white dark:bg-[#0c1322] border border-gray-150 dark:border-white/10 rounded-2xl p-4 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none group-hover:pointer-events-auto">
@@ -670,12 +719,14 @@ export default function App({ ssrPath }: AppProps) {
                   Interactive Core Presets
                 </span>
                 <div className="space-y-1">
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/iot?usecase=thermal"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedIotUseCase('thermal');
                       navigateTo('#/iot');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight">
                       1. Predictive Cooling
@@ -683,14 +734,16 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       Deploys high thermal liquid pump sweeps at 95% threshold.
                     </span>
-                  </button>
+                  </a>
 
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/iot?usecase=peak-shaving"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedIotUseCase('peak-shaving');
                       navigateTo('#/iot');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight">
                       2. Peak Shaving
@@ -698,14 +751,16 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       Offset substation core demands using lithium battery cells.
                     </span>
-                  </button>
+                  </a>
 
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/iot?usecase=var-control"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedIotUseCase('var-control');
                       navigateTo('#/iot');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight">
                       3. CAP-Correction
@@ -713,14 +768,16 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       Deploy shunt capacitors to maximize lagging phase balance.
                     </span>
-                  </button>
+                  </a>
 
-                  <button 
-                    onClick={() => {
+                  <a 
+                    href="/iot?usecase=islanding"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setSelectedIotUseCase('islanding');
                       navigateTo('#/iot');
                     }}
-                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5"
+                    className="w-full text-left p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition border-0 bg-transparent cursor-pointer group/item flex flex-col items-start gap-0.5 no-underline block"
                   >
                     <span className="text-[10px] font-bold text-gray-800 dark:text-gray-200 group-hover/item:text-[#0012FF] dark:group-hover/item:text-cyan-300 transition-colors uppercase font-mono tracking-tight text-left">
                       4. Islanding Isolation
@@ -728,68 +785,75 @@ export default function App({ ssrPath }: AppProps) {
                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-normal leading-relaxed text-left">
                       Tripping mechanical contactors under transformer hazard.
                     </span>
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
-            <button 
-              onClick={() => navigateTo('#/estimator')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            <a 
+              href="/estimator"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/estimator'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/estimator') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.estimator}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/portfolio')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            </a>
+            <a 
+              href="/portfolio"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/portfolio'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/portfolio') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.works}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/blog')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            </a>
+            <a 
+              href="/blog"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/blog'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/blog') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.blog}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/about')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            </a>
+            <a 
+              href="/about"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/about'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/about') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.about}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/careers')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            </a>
+            <a 
+              href="/careers"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/careers'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/careers') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.careers}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/downloads')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            </a>
+            <a 
+              href="/downloads"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/downloads'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/downloads') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.downloads}
-            </button>
-            <button 
-              onClick={() => navigateTo('#/contact')} 
-              className={`transition-colors cursor-pointer bg-transparent border-none py-1 ${
+            </a>
+            <a 
+              href="/contact"
+              onClick={(e) => { e.preventDefault(); navigateTo('#/contact'); }} 
+              className={`transition-colors cursor-pointer bg-transparent border-none py-1 no-underline ${
                 isLinkActive('#/contact') ? 'text-[#0012FF] dark:text-cyan-400 border-b-2 border-[#0012FF] dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-[#0012FF] dark:hover:text-cyan-300'
               }`}
             >
               {t.nav.contact}
-            </button>
+            </a>
           </nav>
- 
+
           {/* Action CTA & Utility toggles */}
           <div className="flex items-center gap-4">
             {/* Language Switch */}
@@ -855,205 +919,245 @@ export default function App({ ssrPath }: AppProps) {
               className="xl:hidden border-b border-gray-100 dark:border-white/10 bg-white dark:bg-[#0c1322]"
             >
               <nav className="flex flex-col gap-4 px-6 py-5 font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide text-xs">
-                <button 
-                  onClick={() => navigateTo('#/home')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                <a 
+                  href="/"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/home'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/home') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.vision}
-                </button>
-                <button 
-                  onClick={() => navigateTo('#/services')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                </a>
+                <a 
+                  href="/services"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/services'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/services') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.services}
-                </button>
+                </a>
                 <div className="flex flex-col gap-1 text-left">
-                  <button 
-                    onClick={() => setMobileProductsSubmenuOpen(!mobileProductsSubmenuOpen)} 
-                    className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer flex items-center justify-between ${
+                  <a 
+                    href="/products"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setMobileProductsSubmenuOpen(!mobileProductsSubmenuOpen);
+                    }} 
+                    className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer flex items-center justify-between no-underline block ${
                       isLinkActive('#/products') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                     }`}
                   >
                     <span>{t.nav.products}</span>
                     <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileProductsSubmenuOpen ? 'rotate-180' : ''}`} />
-                  </button>
+                  </a>
                   
                   {mobileProductsSubmenuOpen && (
                     <div className="pl-4 mt-2 mb-1 border-l border-gray-150 dark:border-white/10 flex flex-col gap-2.5 py-1 text-[11px] normal-case tracking-normal">
-                      <button 
-                        onClick={() => {
+                      <a 
+                        href="/products"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedCategory(null);
                           navigateTo('#/products');
                           setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ {language === 'tr' ? '1. Tüm Sistemler' : '1. All Systems'}
-                      </button>
-                      <button 
-                        onClick={() => {
+                      </a>
+                      <a 
+                        href="/products?category=industrial"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedCategory('industrial');
                           navigateTo('#/products');
                           setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ {language === 'tr' ? '2. Ağır Sanayi' : '2. Heavy Industrial'}
-                      </button>
-                      <button 
-                        onClick={() => {
+                      </a>
+                      <a 
+                        href="/products?category=renewable"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedCategory('renewable');
                           navigateTo('#/products');
                           setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ {language === 'tr' ? '3. Yenilenebilir Şebeke' : '3. Renewable Grid'}
-                      </button>
-                      <button 
-                        onClick={() => {
+                      </a>
+                      <a 
+                        href="/products?category=datacenter"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedCategory('datacenter');
                           navigateTo('#/products');
                           setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ {language === 'tr' ? '4. Kritik Veri Girişi' : '4. Critical Backup'}
-                      </button>
-                      <button 
-                        onClick={() => {
+                      </a>
+                      <a 
+                        href="/products?category=commercial"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedCategory('commercial');
                           navigateTo('#/products');
                           setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.2 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ {language === 'tr' ? '5. Akıllı Bina (BMS)' : '5. Smart BMS Panel'}
-                      </button>
+                      </a>
                     </div>
                   )}
                 </div>
                 <div className="flex flex-col gap-1 text-left">
-                  <button 
-                    onClick={() => setMobileIotSubmenuOpen(!mobileIotSubmenuOpen)} 
-                    className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer flex items-center justify-between ${
+                  <a 
+                    href="/iot"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setMobileIotSubmenuOpen(!mobileIotSubmenuOpen);
+                    }} 
+                    className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer flex items-center justify-between no-underline block ${
                       isLinkActive('#/iot') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                     }`}
                   >
                     <span>{t.nav.iot}</span>
                     <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobileIotSubmenuOpen ? 'rotate-180' : ''}`} />
-                  </button>
+                  </a>
                   
                   {mobileIotSubmenuOpen && (
                     <div className="pl-4 mt-2 mb-1 border-l border-gray-150 dark:border-white/10 flex flex-col gap-2.5 py-1 text-[11px] normal-case tracking-normal">
-                      <button 
-                        onClick={() => {
+                      <a 
+                        href="/iot?usecase=thermal"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedIotUseCase('thermal');
                           navigateTo('#/iot');
+                          setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.5 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.5 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ 1. Predictive Cooling Sweep
-                      </button>
-                      <button 
-                        onClick={() => {
+                      </a>
+                      <a 
+                        href="/iot?usecase=peak-shaving"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedIotUseCase('peak-shaving');
                           navigateTo('#/iot');
+                          setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.5 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.5 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ 2. Renewable Peak-Shaving BESS
-                      </button>
-                      <button 
-                        onClick={() => {
+                      </a>
+                      <a 
+                        href="/iot?usecase=var-control"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedIotUseCase('var-control');
                           navigateTo('#/iot');
+                          setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.5 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.5 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ 3. CAP-Correction Sync
-                      </button>
-                      <button 
-                        onClick={() => {
+                      </a>
+                      <a 
+                        href="/iot?usecase=islanding"
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSelectedIotUseCase('islanding');
                           navigateTo('#/iot');
+                          setMobileMenuOpen(false);
                         }}
-                        className="text-left bg-transparent border-none py-1.5 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer"
+                        className="text-left bg-transparent border-none py-1.5 font-medium text-gray-600 dark:text-gray-300 hover:text-[#0012FF] dark:hover:text-cyan-300 cursor-pointer no-underline block"
                       >
                         ⚡ 4. Islanding Breaker Isolation
-                      </button>
+                      </a>
                     </div>
                   )}
                 </div>
-                <button 
-                  onClick={() => navigateTo('#/estimator')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                <a 
+                  href="/estimator"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/estimator'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/estimator') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.estimator}
-                </button>
-                <button 
-                  onClick={() => navigateTo('#/portfolio')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                </a>
+                <a 
+                  href="/portfolio"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/portfolio'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/portfolio') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.works}
-                </button>
-                <button 
-                  onClick={() => navigateTo('#/blog')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                </a>
+                <a 
+                  href="/blog"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/blog'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/blog') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.blog}
-                </button>
-                <button 
-                  onClick={() => navigateTo('#/about')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                </a>
+                <a 
+                  href="/about"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/about'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/about') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.about}
-                </button>
-                <button 
-                  onClick={() => navigateTo('#/careers')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                </a>
+                <a 
+                  href="/careers"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/careers'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/careers') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.careers}
-                </button>
-                <button 
-                  onClick={() => navigateTo('#/downloads')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                </a>
+                <a 
+                  href="/downloads"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/downloads'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/downloads') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.downloads}
-                </button>
-                <button 
-                  onClick={() => navigateTo('#/contact')} 
-                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer ${
+                </a>
+                <a 
+                  href="/contact"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/contact'); setMobileMenuOpen(false); }} 
+                  className={`text-left hover:text-[#0012FF] bg-transparent border-none py-1 cursor-pointer no-underline block ${
                     isLinkActive('#/contact') ? 'text-[#0012FF] dark:text-cyan-400 font-bold' : ''
                   }`}
                 >
                   {t.nav.contact}
-                </button>
+                </a>
                 
                 <hr className="border-gray-100 dark:border-white/5 my-1" />
                 
-                <button
-                  onClick={() => navigateTo('#/estimator')}
-                  className="py-3 px-4 rounded-xl bg-gray-900 dark:bg-cyan-400 dark:text-slate-950 text-white text-center font-bold hover:bg-gray-800 transition uppercase text-xs cursor-pointer border-0"
+                <a
+                  href="/estimator"
+                  onClick={(e) => { e.preventDefault(); navigateTo('#/estimator'); setMobileMenuOpen(false); }}
+                  className="py-3 px-4 rounded-xl bg-gray-900 dark:bg-cyan-400 dark:text-slate-950 text-white text-center font-bold hover:bg-gray-800 transition uppercase text-xs cursor-pointer border-0 no-underline block"
                 >
                   {t.nav.actionBtn}
-                </button>
+                </a>
               </nav>
             </motion.div>
           )}
