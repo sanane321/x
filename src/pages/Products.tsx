@@ -6,15 +6,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../context/AppContext';
-import { Zap, ShoppingCart, Check, ChevronLeft, ChevronRight, Plus, Minus } from 'lucide-react';
+import { Zap, ShoppingCart, Check, ChevronLeft, ChevronRight, Plus, Minus, Info } from 'lucide-react';
 import { EstimateConfiguration, CostBreakdown } from '../types';
+import { getProductCollection } from '../data/products';
 
 interface ProductsProps {
   onAddNewInquiry: (config: EstimateConfiguration & { cost: CostBreakdown; timeline: string }) => void;
+  onNavigate: (path: string) => void;
   key?: string;
 }
 
-export default function Products({ onAddNewInquiry }: ProductsProps) {
+export default function Products({ onAddNewInquiry, onNavigate }: ProductsProps) {
   const { t, language, selectedCategory, setSelectedCategory, basket, addToBasket, updateBasketQuantity } = useApp();
   const [activeInquiryId, setActiveInquiryId] = useState<string | null>(null);
   const [clientName, setClientName] = useState('');
@@ -23,93 +25,7 @@ export default function Products({ onAddNewInquiry }: ProductsProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 2;
 
-  const productCollection = [
-    {
-      id: 'prod-mvs',
-      name: t.products.p1Name,
-      desc: t.products.p1Desc,
-      leadTime: 8,
-      specs: [
-        'Voltage Rating: up to 24kV Max continuous feed',
-        'Current Rating: 1250A - 2500A Busbar rating',
-        'Breaker: Highly reliable vacuum circuit breakers',
-        'Enclosure: IEC 62271-200 Arc-resistant metal-clad config',
-      ],
-      estimatedCost: 85000,
-      voltage: '13.8kV',
-      amperage: 1200,
-      discipline: 'industrial',
-      imageSrc: '/src/assets/images/mvs_switchgear_1779335480278.png',
-    },
-    {
-      id: 'prod-megapack',
-      name: t.products.p2Name,
-      desc: t.products.p2Desc,
-      leadTime: 16,
-      specs: [
-        'Total Cap.: 5.0 Megawatt-hours modular liquid-cooled',
-        'Inverter Ratio: Bi-directional high frequency coupling',
-        'C-Rate: 1C rapid dispatch peak-shaving system',
-        'Safety: Double structural fire barrier enclosure & thermal runaways',
-      ],
-      estimatedCost: 1150000,
-      voltage: '277/480V',
-      amperage: 2000,
-      discipline: 'renewable',
-      imageSrc: '/src/assets/images/grid_batteries_1779335502733.png',
-    },
-    {
-      id: 'prod-ats',
-      name: t.products.p3Name,
-      desc: t.products.p3Desc,
-      leadTime: 6,
-      specs: [
-        'Amp limits: 400A to 4000A structural scale options',
-        'Transition delay: Built under 4ms latency switching limits',
-        'Isolation level: Form 4 Type 7 segregated busbars',
-        'Control board: Integrated double fiber telemetry gateway',
-      ],
-      estimatedCost: 48000,
-      voltage: '277/480V',
-      amperage: 800,
-      discipline: 'datacenter',
-      imageSrc: '/src/assets/images/transfer_switch_1779335521007.png',
-    },
-    {
-      id: 'prod-charger',
-      name: t.products.p4Name,
-      desc: t.products.p4Desc,
-      leadTime: 10,
-      specs: [
-        'Charging rate: Liquid cooled up to 350kW rapid DC output',
-        'Connector ties: Dual CCS / NACS connections dynamic scheduling',
-        'Power alignment: Integrated grid power-factor corrections',
-        'Enclosure: Zero-vibration IP66 cast alloy shell',
-      ],
-      estimatedCost: 65000,
-      voltage: '277/480V',
-      amperage: 400,
-      discipline: 'renewable',
-      imageSrc: '/src/assets/images/dc_charger_1779335540876.png',
-    },
-    {
-      id: 'prod-bms',
-      name: t.products.p5Name,
-      desc: t.products.p5Desc,
-      leadTime: 5,
-      specs: [
-        'Interfaces: Gigabit Ethernet fiber ports + RS485 loops',
-        'Monitoring: Dual core digital system boards thermal breakers',
-        'Standards: BACnet, Modbus TCP, OPC UA native protocols',
-        'Screen panel: 10 inch high contrast industrial diagnostic display',
-      ],
-      estimatedCost: 19500,
-      voltage: '120/208V',
-      amperage: 100,
-      discipline: 'commercial',
-      imageSrc: '/src/assets/images/bms_controller_1779335563008.png',
-    },
-  ];
+  const productCollection = getProductCollection(t);
 
   const categories = [
     { id: null, labelEn: 'All Systems', labelTr: 'Tüm Sistemler' },
@@ -236,22 +152,42 @@ export default function Products({ onAddNewInquiry }: ProductsProps) {
                 </div>
 
                 {prod.imageSrc && (
-                  <div className="relative overflow-hidden rounded-2xl aspect-[4/3] bg-gray-50 dark:bg-slate-950 border border-gray-150/40 dark:border-white/5 group mb-4">
+                  <div 
+                    onClick={() => onNavigate('#/products/' + prod.id)}
+                    className="relative overflow-hidden rounded-2xl aspect-[4/3] bg-gray-50 dark:bg-slate-950 border border-gray-150/40 dark:border-white/5 group mb-4 cursor-pointer"
+                  >
                     <img 
                       src={prod.imageSrc} 
                       alt={prod.name}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-[1.03]"
                     />
+                    <div className="absolute inset-0 bg-gray-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="bg-white/90 dark:bg-slate-900/90 text-gray-900 dark:text-white text-xs font-mono font-semibold px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/15">
+                        {language === 'tr' ? 'Özellikleri ve Telemetriyi İncele ➔' : 'View Specs & Telemetry ➔'}
+                      </span>
+                    </div>
                   </div>
                 )}
 
-                <h3 className="text-xl sm:text-2xl font-display font-semibold tracking-tight text-gray-900 dark:text-white">
+                <h3 
+                  onClick={() => onNavigate('#/products/' + prod.id)}
+                  className="text-xl sm:text-2xl font-display font-semibold tracking-tight text-gray-900 dark:text-white hover:text-[#0012FF] dark:hover:text-cyan-400 cursor-pointer transition-colors"
+                >
                   {prod.name}
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">
                   {prod.desc}
                 </p>
+
+                <div className="flex justify-start">
+                  <button
+                    onClick={() => onNavigate('#/products/' + prod.id)}
+                    className="text-xs font-mono font-semibold text-[#0012FF] dark:text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-none p-0"
+                  >
+                    <span>{language === 'tr' ? 'Detaylı İncele ve Canlı Telemetri' : 'Detailed Specs & Live IoT Telemetry'} &rarr;</span>
+                  </button>
+                </div>
 
                 <div className="bg-gray-50 dark:bg-slate-950 p-4 rounded-xl border border-gray-150/50 dark:border-white/5">
                   <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-gray-400 dark:text-gray-500 block mb-2">
