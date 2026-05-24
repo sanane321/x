@@ -1,11 +1,18 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 
-// Determine __dirname equivalents for modern ES modules
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Determine root directory equivalents for ES module and CommonJS bundle formats
+const getDirname = () => {
+  try {
+    return __dirname;
+  } catch {
+    return path.dirname(fileURLToPath(import.meta.url));
+  }
+};
+const dirPath = getDirname();
 
 const seoMetadata: Record<string, { title: string; description: string; keywords: string }> = {
   'home': {
@@ -79,7 +86,8 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     // Serve static files in production, EXCLUDING index.html itself so SSR handles requests
-    const distPath = path.resolve(__dirname, 'dist');
+    // In production, dirPath is already /app/dist because server.cjs is in /dist
+    const distPath = isProd ? dirPath : path.resolve(dirPath, 'dist');
     app.use(express.static(distPath, { index: false }));
   }
 
@@ -99,22 +107,18 @@ async function startServer() {
 
       if (!isProd) {
         // Dev: read template from root & transform using Vite compiled plugins/styles
-        template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
+        template = fs.readFileSync(path.resolve(dirPath, 'index.html'), 'utf-8');
         template = await vite.transformIndexHtml(url, template);
         // Dev: load entry-server on the fly
         const serverModule = await vite.ssrLoadModule('/src/entry-server.tsx');
         renderFn = serverModule.render;
       } else {
-        // Prod: read built template from dist/
-        template = fs.readFileSync(path.resolve(__dirname, 'dist/index.html'), 'utf-8');
-        // Fallback loads from server rendering or tsx runtime loaders
-        try {
-          const serverModule = await import('./src/entry-server.js');
-          renderFn = serverModule.render;
-        } catch {
-          const serverModule = await import('./src/entry-server.tsx');
-          renderFn = serverModule.render;
-        }
+        // Prod: read built template from dist/ (which is sibling to server.cjs as dirPath resolves to dist/)
+        template = fs.readFileSync(path.resolve(dirPath, 'index.html'), 'utf-8');
+        // Load the compiled SSR bundle from dist/entry-server.js
+        const entryServerPath = pathToFileURL(path.resolve(dirPath, 'entry-server.js')).href;
+        const serverModule = await import(entryServerPath);
+        renderFn = serverModule.render;
       }
 
       // 2. Identify active route for SEO metadata lookup
