@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router';
 import { 
   ArrowUpRight, 
   Menu, 
@@ -74,69 +75,31 @@ export default function App({ ssrPath }: AppProps) {
   const [desktopProductsSubmenuOpen, setDesktopProductsSubmenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   
-  // Custom router state synchronized with the URL path or hash
-  const [currentPath, setCurrentPath] = useState<string>(() => {
-    if (ssrPath) {
-      const cleanSsr = ssrPath.startsWith('#') ? ssrPath : `#/${ssrPath.replace(/^\//, '')}`;
-      return cleanSsr === '#/' ? '#/home' : cleanSsr;
-    }
-    if (typeof window === 'undefined') return '#/home';
-    
-    // Support direct clean URL path first (e.g. /services -> #/services)
-    const pathname = window.location.pathname;
-    if (pathname && pathname !== '/') {
-      return `#/${pathname.replace(/^\//, '')}`;
-    }
-    
-    // Important: During the very first client-side render, we ignore hash to match the server-rendered HTML exactly, preventing hydration mismatches.
-    return '#/home';
-  });
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-  // Handle URL hash changes
+  // Scroll to top on path changes
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const handleHashChange = () => {
-      const hash = window.location.hash;
-      const cleanHash = (hash === '' || hash === '#/') ? '#/home' : hash;
-      setCurrentPath(cleanHash);
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    };
-
-    // If starting on empty/root hash or direct URL, align them
-    const hash = window.location.hash;
-    const pathname = window.location.pathname;
-    if (pathname && pathname !== '/') {
-      const clean = `#/${pathname.replace(/^\//, '')}`;
-      if (hash !== clean) {
-        window.location.hash = clean;
-      }
-      setCurrentPath(clean);
-    } else if (hash && hash !== '' && hash !== '#/') {
-      // If there is an existing hash on client mount (e.g. #/products/prod-mvs), safely transition to it post-hydration
-      setCurrentPath(hash);
-    } else {
-      window.location.hash = '#/home';
-      setCurrentPath('#/home');
-    }
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-
-  // Navigation utility - updates both actual browser URL path (for SEO structure) and hash
-  const navigateTo = (pathOrHash: string) => {
-    const route = pathOrHash.replace(/^#\//, '').replace(/^\//, ''); // e.g. "services"
-    const cleanHash = `#/${route}`;
-    const cleanPath = route === 'home' ? '/' : `/${route}`;
-    
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', cleanPath);
-      window.location.hash = cleanHash;
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
+  }, [currentPath]);
+
+  // Navigation utility with backward compatibility adapter for existing button triggers
+  const navigateTo = (pathOrHash: string) => {
+    let route = pathOrHash.replace(/^#\//, '').replace(/^\//, ''); // e.g. "services"
+    if (route === '' || route === 'home') {
+      route = '';
+    }
     
-    setCurrentPath(cleanHash);
+    // Correctly resolve product ids in the adapter
+    if (route.startsWith('products/') && !route.startsWith('products/c/') && !route.startsWith('products/p/') && !route.startsWith('products/details/')) {
+      const prodId = route.substring('products/'.length);
+      route = `products/details/${prodId}`;
+    }
+    
+    navigate(`/${route}`);
     setMobileMenuOpen(false);
   };
 
@@ -215,55 +178,11 @@ export default function App({ ssrPath }: AppProps) {
   };
 
   // Helper to determine active link states
-  const isLinkActive = (hash: string) => currentPath === hash;
-
-  // Render proper subpage component
-  const renderPage = () => {
-    if (currentPath.startsWith('#/products/')) {
-      const productId = currentPath.replace('#/products/', '');
-      return (
-        <ProductDetails 
-          key={`product-${productId}`} 
-          productId={productId} 
-          onAddNewInquiry={handleAddNewInquiry} 
-          onNavigate={navigateTo} 
-        />
-      );
-    }
-
-    switch (currentPath) {
-      case '#/home':
-        return <Home key="home" onNavigate={navigateTo} />;
-      case '#/services':
-        return <Services key="services" onNavigate={navigateTo} />;
-      case '#/products':
-        return <Products key="products" onAddNewInquiry={handleAddNewInquiry} onNavigate={navigateTo} />;
-      case '#/estimator':
-        return (
-          <Estimator 
-            key="estimator"
-            inquiries={inquiries}
-            onAddNewInquiry={handleAddNewInquiry}
-            onDismissInquiry={handleDismissInquiry}
-          />
-        );
-      case '#/portfolio':
-        return <Portfolio key="portfolio" />;
-      case '#/blog':
-        return <Blog key="blog" />;
-      case '#/about':
-        return <About key="about" />;
-      case '#/careers':
-        return <Careers key="careers" />;
-      case '#/contact':
-        return <Contacts key="contact" />;
-      case '#/downloads':
-        return <Downloads key="downloads" />;
-      case '#/iot':
-        return <Iot key="iot" />;
-      default:
-        return <Home key="home" onNavigate={navigateTo} />;
-    }
+  const isLinkActive = (hash: string) => {
+    const cleanPath = hash.replace(/^#/, ''); // e.g. /home or /services
+    const cleanCurrent = currentPath === '/' ? '/home' : currentPath;
+    const cleanLeft = cleanPath === '/' ? '/home' : cleanPath;
+    return cleanCurrent === cleanLeft || cleanCurrent.startsWith(cleanLeft + '/');
   };
 
   return (
@@ -1073,7 +992,37 @@ export default function App({ ssrPath }: AppProps) {
       {/* DETACHED MAIN TRANSITIONAL CONTENT LAYER */}
       <main className="flex-grow pt-24 sm:pt-28 xl:pt-12 xl:pl-72 pb-12 w-full">
         <AnimatePresence mode="wait">
-          {renderPage()}
+          <Routes>
+            <Route path="/" element={<Home onNavigate={navigateTo} />} />
+            <Route path="/home" element={<Home onNavigate={navigateTo} />} />
+            <Route path="/services" element={<Services onNavigate={navigateTo} />} />
+            
+            <Route path="/products" element={<Products onAddNewInquiry={handleAddNewInquiry} onNavigate={navigateTo} />} />
+            <Route path="/products/c/:category" element={<Products onAddNewInquiry={handleAddNewInquiry} onNavigate={navigateTo} />} />
+            <Route path="/products/p/:page" element={<Products onAddNewInquiry={handleAddNewInquiry} onNavigate={navigateTo} />} />
+            <Route path="/products/c/:category/p/:page" element={<Products onAddNewInquiry={handleAddNewInquiry} onNavigate={navigateTo} />} />
+            <Route path="/products/details/:productId" element={<ProductDetails onAddNewInquiry={handleAddNewInquiry} onNavigate={navigateTo} />} />
+            <Route path="/products/:productId" element={<ProductDetails onAddNewInquiry={handleAddNewInquiry} onNavigate={navigateTo} />} />
+
+            <Route path="/estimator" element={<Estimator inquiries={inquiries} onAddNewInquiry={handleAddNewInquiry} onDismissInquiry={handleDismissInquiry} />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/c/:category" element={<Blog />} />
+            <Route path="/blog/p/:page" element={<Blog />} />
+            <Route path="/blog/c/:category/p/:page" element={<Blog />} />
+            <Route path="/blog/article/:articleId" element={<Blog />} />
+
+            <Route path="/downloads" element={<Downloads />} />
+            <Route path="/downloads/c/:category" element={<Downloads />} />
+
+            <Route path="/about" element={<About />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/contact" element={<Contacts />} />
+            <Route path="/iot" element={<Iot />} />
+            <Route path="/iot/:useCase" element={<Iot />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
         </AnimatePresence>
       </main>
 

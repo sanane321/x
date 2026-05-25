@@ -122,7 +122,32 @@ async function startServer() {
       }
 
       // 2. Identify active route for SEO metadata lookup
-      const routeName = url.replace(/^\//, '').toLowerCase() || 'home';
+      let routeName = 'home';
+      const cleanUrl = url.toLowerCase();
+      if (cleanUrl === '/' || cleanUrl === '/home') {
+        routeName = 'home';
+      } else if (cleanUrl.startsWith('/services')) {
+        routeName = 'services';
+      } else if (cleanUrl.startsWith('/products')) {
+        routeName = 'products';
+      } else if (cleanUrl.startsWith('/estimator')) {
+        routeName = 'estimator';
+      } else if (cleanUrl.startsWith('/portfolio')) {
+        routeName = 'portfolio';
+      } else if (cleanUrl.startsWith('/blog')) {
+        routeName = 'blog';
+      } else if (cleanUrl.startsWith('/about')) {
+        routeName = 'about';
+      } else if (cleanUrl.startsWith('/careers')) {
+        routeName = 'careers';
+      } else if (cleanUrl.startsWith('/contact')) {
+        routeName = 'contact';
+      } else if (cleanUrl.startsWith('/downloads')) {
+        routeName = 'downloads';
+      } else if (cleanUrl.startsWith('/iot')) {
+        routeName = 'iot';
+      }
+
       const meta = seoMetadata[routeName] || seoMetadata['home'];
 
       // 3. Render the React App

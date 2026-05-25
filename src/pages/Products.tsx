@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useParams, useNavigate } from 'react-router';
 import { useApp } from '../context/AppContext';
 import { Zap, ShoppingCart, Check, ChevronLeft, ChevronRight, Plus, Minus, Info } from 'lucide-react';
 import { EstimateConfiguration, CostBreakdown } from '../types';
@@ -17,12 +18,17 @@ interface ProductsProps {
 }
 
 export default function Products({ onAddNewInquiry, onNavigate }: ProductsProps) {
-  const { t, language, selectedCategory, setSelectedCategory, basket, addToBasket, updateBasketQuantity } = useApp();
+  const { t, language, basket, addToBasket, updateBasketQuantity } = useApp();
+  const { category, page } = useParams<{ category?: string; page?: string }>();
+  const navigate = useNavigate();
+
+  const selectedCategory = category || null;
+  const currentPage = page ? parseInt(page, 10) : 1;
+
   const [activeInquiryId, setActiveInquiryId] = useState<string | null>(null);
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [submitted, setSubmitted] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 2;
 
   const productCollection = getProductCollection(t);
@@ -35,13 +41,25 @@ export default function Products({ onAddNewInquiry, onNavigate }: ProductsProps)
     { id: 'commercial', labelEn: 'Smart BMS Panel', labelTr: 'Akıllı Bina Panosu' },
   ];
 
+  const handleCategoryChange = (catId: string | null) => {
+    if (catId) {
+      navigate(`/products/c/${catId}`);
+    } else {
+      navigate('/products');
+    }
+  };
+
+  const handlePageChange = (pageNum: number) => {
+    if (selectedCategory) {
+      navigate(`/products/c/${selectedCategory}/p/${pageNum}`);
+    } else {
+      navigate(`/products/p/${pageNum}`);
+    }
+  };
+
   const filteredProducts = selectedCategory
     ? productCollection.filter((prod) => prod.discipline === selectedCategory)
     : productCollection;
-
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory]);
 
   const totalPages = Math.ceil(filteredProducts.length / PAGE_SIZE);
   const displayedProducts = filteredProducts.slice(
@@ -115,7 +133,7 @@ export default function Products({ onAddNewInquiry, onNavigate }: ProductsProps)
             return (
               <button
                 key={cat.id ?? 'all'}
-                onClick={() => setSelectedCategory(cat.id)}
+                onClick={() => handleCategoryChange(cat.id)}
                 className={`py-1.5 px-3.5 rounded-xl text-xs font-mono font-semibold transition-all cursor-pointer ${
                   isActive
                     ? 'bg-gray-950 dark:bg-cyan-400 text-white dark:text-slate-950 shadow-sm font-extrabold'
@@ -335,7 +353,7 @@ export default function Products({ onAddNewInquiry, onNavigate }: ProductsProps)
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-8" id="products-pagination">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
             className="p-2.5 border border-gray-200 dark:border-white/10 rounded-xl disabled:opacity-40 hover:bg-[#0012FF]/5 dark:hover:bg-cyan-400/10 transition-colors cursor-pointer text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-900"
             aria-label="Previous page"
@@ -348,7 +366,7 @@ export default function Products({ onAddNewInquiry, onNavigate }: ProductsProps)
             return (
               <button
                 key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
+                onClick={() => handlePageChange(pageNum)}
                 className={`h-10 w-10 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer border ${
                   currentPage === pageNum
                     ? 'bg-gray-950 dark:bg-cyan-400 text-white dark:text-slate-950 border-gray-950 dark:border-cyan-400 shadow-sm font-extrabold'
@@ -361,7 +379,7 @@ export default function Products({ onAddNewInquiry, onNavigate }: ProductsProps)
           })}
           
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
             disabled={currentPage === totalPages}
             className="p-2.5 border border-gray-200 dark:border-white/10 rounded-xl disabled:opacity-40 hover:bg-[#0012FF]/5 dark:hover:bg-cyan-400/10 transition-colors cursor-pointer text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-900"
             aria-label="Next page"

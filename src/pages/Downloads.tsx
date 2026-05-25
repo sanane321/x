@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useParams, useNavigate } from 'react-router';
 import { useApp } from '../context/AppContext';
 import { 
   FileText, 
@@ -25,9 +26,20 @@ interface DownloadItem {
 
 export default function Downloads() {
   const { t } = useApp();
+  const { category } = useParams<{ category?: string }>();
+  const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'specs' | 'bim' | 'certificates'>('all');
+  const activeTab = (category || 'all') as 'all' | 'specs' | 'bim' | 'certificates';
   const [downloadingStates, setDownloadingStates] = useState<Record<string, 'idle' | 'loading' | 'completed'>>({});
+
+  const handleTabChange = (tab: 'all' | 'specs' | 'bim' | 'certificates') => {
+    if (tab === 'all') {
+      navigate('/downloads');
+    } else {
+      navigate(`/downloads/c/${tab}`);
+    }
+  };
 
   const downloadItems: DownloadItem[] = [
     {
@@ -161,7 +173,7 @@ export default function Downloads() {
           {(['all', 'specs', 'bim', 'certificates'] as const).map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabChange(tab)}
               className={`py-2 px-4 rounded-xl text-xs font-bold uppercase tracking-wide transition-all cursor-pointer border ${
                 activeTab === tab
                   ? 'bg-gray-950 dark:bg-cyan-400 text-white dark:text-slate-950 border-gray-950 dark:border-cyan-400 shadow-sm'
@@ -284,7 +296,7 @@ export default function Downloads() {
             <p className="text-xs text-gray-400">Try adjusting your search filters or try another word.</p>
           </div>
           <button
-            onClick={() => { setSearchQuery(''); setActiveTab('all'); }}
+            onClick={() => { setSearchQuery(''); handleTabChange('all'); }}
             className="text-xs font-bold text-[#0012FF] dark:text-cyan-400 hover:underline bg-transparent border-0 cursor-pointer"
           >
             Clear Search Filter

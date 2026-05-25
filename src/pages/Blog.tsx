@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useParams, useNavigate } from 'react-router';
 import { useApp } from '../context/AppContext';
 import { BookOpen, Search, Filter, Calendar, Clock, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -23,10 +24,14 @@ interface Article {
 
 export default function Blog() {
   const { t, language } = useApp();
+  const { category, page, articleId } = useParams<{ category?: string; page?: string; articleId?: string }>();
+  const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCat, setSelectedCat] = useState<'all' | 'substation' | 'bim' | 'grid'>('all');
-  const [activeArticleId, setActiveArticleId] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const selectedCat = (category || 'all') as 'all' | 'substation' | 'bim' | 'grid';
+  const currentPage = page ? parseInt(page, 10) : 1;
+  const activeArticleId = articleId || null;
+
   const PAGE_SIZE = 2;
 
   const articles: Article[] = [
@@ -100,6 +105,34 @@ Bu makale, otomatik şebeke geçişi sırasındaki gecikme sınırlamalarını, 
     },
   ];
 
+  const handleCategoryChange = (cat: 'all' | 'substation' | 'bim' | 'grid') => {
+    if (cat === 'all') {
+      navigate('/blog');
+    } else {
+      navigate(`/blog/c/${cat}`);
+    }
+  };
+
+  const handlePageChange = (pageNum: number) => {
+    if (selectedCat && selectedCat !== 'all') {
+      navigate(`/blog/c/${selectedCat}/p/${pageNum}`);
+    } else {
+      navigate(`/blog/p/${pageNum}`);
+    }
+  };
+
+  const handleArticleClick = (artId: string) => {
+    navigate(`/blog/article/${artId}`);
+  };
+
+  const handleBackToBlog = () => {
+    if (selectedCat && selectedCat !== 'all') {
+      navigate(`/blog/c/${selectedCat}`);
+    } else {
+      navigate('/blog');
+    }
+  };
+
   const filtered = articles.filter((art) => {
     const title = language === 'en' ? art.titleEn : art.titleTr;
     const summary = language === 'en' ? art.summaryEn : art.summaryTr;
@@ -137,72 +170,73 @@ Bu makale, otomatik şebeke geçişi sırasındaki gecikme sınırlamalarını, 
             className="space-y-6 text-left max-w-3xl"
           >
             <button
-              onClick={() => setActiveArticleId(null)}
-              className="inline-flex items-center gap-2 text-xs font-mono font-bold text-[#0012FF] dark:text-cyan-400 border border-gray-250 dark:border-white/10 rounded-xl px-4 py-2.5 bg-white dark:bg-slate-900 cursor-pointer"
+              onClick={handleBackToBlog}
+              className="flex items-center gap-1.5 text-xs font-mono font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-4 bg-transparent border-none p-0 cursor-pointer"
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span>{t.blog.backToBlog}</span>
+              <ArrowLeft className="h-4 w-4" /> Back to Articles
             </button>
 
-            <div className="space-y-3 pt-4">
-              <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-gray-150 dark:bg-white/10 text-gray-500 uppercase font-bold">
+            <div className="flex items-center gap-3 text-xs font-mono text-gray-500 dark:text-gray-400">
+              <span className="bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded uppercase tracking-wider text-[#0012FF] dark:text-cyan-400 font-bold">
                 {activeArticle.category}
               </span>
-              <h1 className="text-2xl sm:text-4xl font-display font-bold text-gray-900 dark:text-white leading-tight">
-                {language === 'en' ? activeArticle.titleEn : activeArticle.titleTr}
-              </h1>
-              <div className="flex items-center gap-4 text-xs font-mono text-gray-400">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {activeArticle.date}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" />
-                  {activeArticle.readTime} {t.blog.minRead}
-                </span>
-              </div>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                {activeArticle.date}
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {activeArticle.readTime} {t.blog.minRead}
+              </span>
             </div>
 
-            <div className="h-px bg-gray-150 dark:bg-white/10 my-6" />
+            <h1 className="text-2xl sm:text-4xl font-display font-semibold tracking-tight text-gray-900 dark:text-white leading-tight">
+              {language === 'en' ? activeArticle.titleEn : activeArticle.titleTr}
+            </h1>
 
-            <div className="prose prose-slate dark:prose-invert space-y-4 text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-sans">
-              <p className="font-medium text-gray-900 dark:text-white">
-                {language === 'en' ? activeArticle.summaryEn : activeArticle.summaryTr}
-              </p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base leading-relaxed border-l-2 border-gray-150 dark:border-white/10 pl-4 py-1 italic">
+              {language === 'en' ? activeArticle.summaryEn : activeArticle.summaryTr}
+            </p>
+
+            <article className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed space-y-4">
               {language === 'en' ? (
                 <div className="whitespace-pre-line">{activeArticle.contentEn}</div>
               ) : (
                 <div className="whitespace-pre-line">{activeArticle.contentTr}</div>
               )}
-            </div>
+            </article>
           </motion.div>
         ) : (
-          <motion.div key="blog-grid" className="space-y-8 text-left">
-            {/* Page Header */}
-            <div className="max-w-3xl space-y-3">
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#0012FF] dark:text-cyan-400 block">
-                {t.blog.tag}
-              </span>
-              <h1 className="text-3xl sm:text-5xl font-display font-medium tracking-tight text-gray-900 dark:text-white leading-tight">
-                {t.blog.title}
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base leading-relaxed max-w-2xl">
-                {t.blog.desc}
-              </p>
-            </div>
+          <motion.div
+            key="article-list"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -15 }}
+            className="space-y-8"
+          >
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-150 dark:border-white/10 pb-6 text-left">
+              <div className="space-y-1">
+                <h1 className="text-2xl sm:text-4xl font-display font-semibold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <BookOpen className="h-6 w-6 text-[#0012FF] dark:text-cyan-400" />
+                  {t.blog.title}
+                </h1>
+                <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">
+                  {t.blog.desc}
+                </p>
+              </div>
 
-            {/* Controls Bar */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between border-y border-gray-150 dark:border-white/10 py-4 select-none">
-              {/* Search */}
-              <div className="relative w-full sm:max-w-xs">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              {/* Search bar */}
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
                 <input
                   type="text"
                   placeholder={t.blog.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    setCurrentPage(1);
                   }}
                   className="w-full bg-white dark:bg-slate-900 border border-gray-150 dark:border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs focus:ring-1 focus:ring-[#0012FF] outline-none text-gray-800 dark:text-white"
                 />
@@ -213,10 +247,7 @@ Bu makale, otomatik şebeke geçişi sırasındaki gecikme sınırlamalarını, 
                 {(['all', 'substation', 'bim', 'grid'] as const).map((cat) => (
                   <button
                     key={cat}
-                    onClick={() => {
-                      setSelectedCat(cat);
-                      setCurrentPage(1);
-                    }}
+                    onClick={() => handleCategoryChange(cat)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition cursor-pointer ${
                       selectedCat === cat
                         ? 'bg-gray-950 text-white dark:bg-cyan-400 dark:text-black font-bold'
@@ -230,47 +261,53 @@ Bu makale, otomatik şebeke geçişi sırasındaki gecikme sınırlamalarını, 
             </div>
 
             {/* Articles Grid list */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {displayedArticles.map((art) => (
-                <div
-                  key={art.id}
-                  className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:shadow-md transition duration-300"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-xs font-mono text-gray-400">
-                      <span className="uppercase text-gray-500">{art.category}</span>
-                      <span>{art.date}</span>
+            {displayedArticles.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayedArticles.map((art) => (
+                  <div
+                    key={art.id}
+                    className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:shadow-md transition duration-300"
+                  >
+                    <div className="space-y-3 text-left">
+                      <div className="flex items-center justify-between text-xs font-mono text-gray-400">
+                        <span className="uppercase text-gray-500 font-bold text-[#0012FF] dark:text-cyan-400">{art.category}</span>
+                        <span>{art.date}</span>
+                      </div>
+
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white hover:text-[#0012FF] dark:hover:text-cyan-300 transition line-clamp-2">
+                        {language === 'en' ? art.titleEn : art.titleTr}
+                      </h3>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed line-clamp-3">
+                        {language === 'en' ? art.summaryEn : art.summaryTr}
+                      </p>
                     </div>
 
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white hover:text-[#0012FF] pointer-events-none transition line-clamp-2">
-                      {language === 'en' ? art.titleEn : art.titleTr}
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed line-clamp-3">
-                      {language === 'en' ? art.summaryEn : art.summaryTr}
-                    </p>
+                    <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
+                      <span className="text-xs text-gray-400 font-mono flex items-center gap-1 font-semibold">
+                        <Clock className="h-3 w-3" />
+                        {art.readTime} {t.blog.minRead}
+                      </span>
+                      <button
+                        onClick={() => handleArticleClick(art.id)}
+                        className="text-xs font-mono font-bold text-[#0012FF] dark:text-cyan-300 hover:underline cursor-pointer bg-transparent border-0 p-0"
+                      >
+                        {t.blog.readMore} →
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
-                    <span className="text-xs text-gray-400 font-mono flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {art.readTime} {t.blog.minRead}
-                    </span>
-                    <button
-                      onClick={() => setActiveArticleId(art.id)}
-                      className="text-xs font-mono font-bold text-[#0012FF] dark:text-cyan-300 hover:underline cursor-pointer"
-                    >
-                      {t.blog.readMore} →
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-12 text-center text-gray-500 dark:text-gray-400">
+                No matching articles found.
+              </div>
+            )}
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 pt-4" id="blog-pagination">
                 <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  onClick={() => handlePageChange(Math.max(activePage - 1, 1))}
                   disabled={activePage === 1}
                   className="p-2.5 border border-gray-200 dark:border-white/10 rounded-xl disabled:opacity-40 hover:bg-[#0012FF]/5 dark:hover:bg-cyan-400/10 transition-colors cursor-pointer text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-900"
                   aria-label="Previous page"
@@ -283,7 +320,7 @@ Bu makale, otomatik şebeke geçişi sırasındaki gecikme sınırlamalarını, 
                   return (
                     <button
                       key={pageNum}
-                      onClick={() => setCurrentPage(pageNum)}
+                      onClick={() => handlePageChange(pageNum)}
                       className={`h-10 w-10 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer border ${
                         activePage === pageNum
                           ? 'bg-gray-950 dark:bg-cyan-400 text-white dark:text-slate-950 border-gray-950 dark:border-cyan-400 shadow-sm font-extrabold'
@@ -296,7 +333,7 @@ Bu makale, otomatik şebeke geçişi sırasındaki gecikme sınırlamalarını, 
                 })}
                 
                 <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  onClick={() => handlePageChange(Math.min(activePage + 1, totalPages))}
                   disabled={activePage === totalPages}
                   className="p-2.5 border border-gray-200 dark:border-white/10 rounded-xl disabled:opacity-40 hover:bg-[#0012FF]/5 dark:hover:bg-cyan-400/10 transition-colors cursor-pointer text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-900"
                   aria-label="Next page"

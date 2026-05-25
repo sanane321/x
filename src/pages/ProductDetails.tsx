@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useParams } from 'react-router';
 import { useApp } from '../context/AppContext';
 import { 
   ArrowLeft, 
@@ -22,13 +23,16 @@ import { getProductCollection, ProductItem } from '../data/products';
 import { EstimateConfiguration, CostBreakdown } from '../types';
 
 interface ProductDetailsProps {
-  productId: string;
+  productId?: string;
   onAddNewInquiry: (config: EstimateConfiguration & { cost: CostBreakdown; timeline: string }) => void;
   onNavigate: (path: string) => void;
   key?: string;
 }
 
-export default function ProductDetails({ productId, onAddNewInquiry, onNavigate }: ProductDetailsProps) {
+export default function ProductDetails({ productId: propProductId, onAddNewInquiry, onNavigate }: ProductDetailsProps) {
+  const { productId: routeProductId } = useParams<{ productId?: string }>();
+  const productId = propProductId || routeProductId || '';
+  
   const { t, language, basket, addToBasket, updateBasketQuantity } = useApp();
   
   const [product, setProduct] = useState<ProductItem | null>(null);
